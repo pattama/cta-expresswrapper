@@ -1,0 +1,19 @@
+image: node:4.2.2
+
+cache:
+  paths:
+    - node_modules/
+
+before_script:
+  - export
+  - npm config set proxy http://webproxy.lon.corp.services:80
+  - npm config set https-proxy http://webproxy.lon.corp.services:80
+  - npm install
+
+stages:
+  - test
+
+job_name:
+  stage: test
+  script:
+    - npm run gitlab-ci

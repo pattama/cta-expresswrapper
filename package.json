@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint --ignore-path .gitignore lib/**/*.js test/**/*.js",
     "test": "mocha -R spec --recursive test",
-    "codecoverage": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec && opener ./coverage/lcov-report/index.html",
+    "codecoverage": "istanbul cover mocha -- -R spec --recursive test",
     "all": "npm run lint && npm run codecoverage",
     "gitlab-ci": "npm run all",
     "docs": "jsdoc2md \"lib/**/*.js\" > DOCUMENTATION.md && jsdoc --readme README.md lib -r -d docs"

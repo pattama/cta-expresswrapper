@@ -20,7 +20,7 @@ const DEFAULTCONFIG = require('./index.config.testdata.js');
 
 describe('ExpressWrapper - Start', function() {
   context('when everything ok', function() {
-    let restapi;
+    let expresswrapper;
     let stubExpress;
     let mockExpressApp;
     let mockHttpServer;
@@ -43,10 +43,10 @@ describe('ExpressWrapper - Start', function() {
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
-      restapi = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      expresswrapper = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
 
       // start
-      restapi.start();
+      expresswrapper.start();
     });
 
     after(function() {
@@ -57,28 +57,28 @@ describe('ExpressWrapper - Start', function() {
     });
 
     it('should log a starting message', function() {
-      expect(restapi.logger.info.calledWith(
-        `Starting Express Application on port ${restapi.port}...`
+      expect(expresswrapper.logger.info.calledWith(
+        `Starting Express Application on port ${expresswrapper.port}...`
       )).to.equal(true);
     });
 
     it('should start the Express App (listen()) on configured port', function() {
-      expect(restapi.server.listen.calledWith(restapi.port)).to.equal(true);
+      expect(expresswrapper.server.listen.calledWith(expresswrapper.port)).to.equal(true);
     });
 
     it('should set isServerStarting property to true', function() {
-      expect(restapi.isServerStarting).to.equal(true);
+      expect(expresswrapper.isServerStarting).to.equal(true);
     });
 
     it('should log a success message', function() {
-      expect(restapi.logger.info.calledWith(
-        `Express Application started successfully on port ${restapi.port}.`
+      expect(expresswrapper.logger.info.calledWith(
+        `Express Application started successfully on port ${expresswrapper.port}.`
       )).to.equal(true);
     });
   });
 
   context('when Express App has already been started', function() {
-    let restapi;
+    let expresswrapper;
     let stubExpress;
     let mockExpressApp;
     let mockHttpServer;
@@ -101,11 +101,11 @@ describe('ExpressWrapper - Start', function() {
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
-      restapi = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      expresswrapper = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
 
       // start
-      restapi.start();
-      restapi.start();
+      expresswrapper.start();
+      expresswrapper.start();
     });
 
     after(function() {
@@ -116,18 +116,18 @@ describe('ExpressWrapper - Start', function() {
     });
 
     it('should not try to start the HTTP Server (listen()) on configured port', function() {
-      expect(restapi.server.listen.calledTwice).to.equal(false);
+      expect(expresswrapper.server.listen.calledTwice).to.equal(false);
     });
 
     it('should log a already-started message', function() {
-      expect(restapi.logger.info.calledWith(
-        `Express Application on port ${restapi.port} has been already started.`
+      expect(expresswrapper.logger.info.calledWith(
+        `Express Application on port ${expresswrapper.port} has been already started.`
       )).to.equal(true);
     });
   });
 
   context('when HTTP Server emits an Error', function() {
-    let restapi;
+    let expresswrapper;
     let stubExpress;
     let mockExpressApp;
     let mockHttpServer;
@@ -150,10 +150,10 @@ describe('ExpressWrapper - Start', function() {
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
-      restapi = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      expresswrapper = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
 
       // start
-      restapi.start();
+      expresswrapper.start();
       const errorCallback = mockHttpServer.listeners('error')[0];
       mockHttpServer.removeListener('error', errorCallback);
       mockHttpServer.on('error', function(error) {
@@ -177,8 +177,8 @@ describe('ExpressWrapper - Start', function() {
     });
 
     it('should log a warning message', function() {
-      return expect(restapi.logger.error.calledWith(
-        `Error emitted by Express Application on port ${restapi.port}: ${expectedError.message}`
+      return expect(expresswrapper.logger.error.calledWith(
+        `Error emitted by Express Application on port ${expresswrapper.port}: ${expectedError.message}`
       )).to.equal(true);
     });
 
@@ -188,7 +188,7 @@ describe('ExpressWrapper - Start', function() {
   });
 
   context('when HTTP Server fails to start (e.g. listen)', function() {
-    let restapi;
+    let expresswrapper;
     let stubExpress;
     let mockExpressApp;
     let mockHttpServer;
@@ -211,7 +211,7 @@ describe('ExpressWrapper - Start', function() {
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
-      restapi = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      expresswrapper = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
     });
 
     after(function() {
@@ -222,10 +222,10 @@ describe('ExpressWrapper - Start', function() {
 
     it('should throw an Error', function() {
       expect(function() {
-        restapi.start();
+        expresswrapper.start();
       }).throw(Error, expectedError);
-      expect(restapi.logger.error.calledWith(
-          `Error when starting Express Application on port ${restapi.port}: ${mockHttpServerListenError.message}`
+      expect(expresswrapper.logger.error.calledWith(
+          `Error when starting Express Application on port ${expresswrapper.port}: ${mockHttpServerListenError.message}`
         )).to.equal(true);
     });
   });

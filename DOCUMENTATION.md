@@ -13,6 +13,8 @@ ExpressWrapper class
 | dependencies | <code>Object</code> | tool's dependencies injected by Cement according to tool's configuration |
 | app | <code>Express</code> | instance of an Express Application |
 | server | <code>Http.Server</code> | instance of a HTTP Server |
+| isServerStarting | <code>Boolean</code> | whether the HTTP Server has began starting or not |
+| routes | <code>Map.&lt;Map&gt;</code> | A Map of Maps of all the routes that have been applied in the Express App. 1st level key is the HTTP Method, 2nd is the path, value is the handler method. |
 
 
 * [ExpressWrapper](#ExpressWrapper)
@@ -37,6 +39,6 @@ See how Cement instantiate tools
 <a name="ExpressWrapper+start"></a>
 
 ### expressWrapper.start()
-Starts the Express Application using configured port
+Starts the HTTP Server using configured port
 
 **Kind**: instance method of <code>[ExpressWrapper](#ExpressWrapper)</code>  

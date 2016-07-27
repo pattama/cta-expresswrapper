@@ -7,6 +7,7 @@ const sinon = require('sinon');
 require('sinon-as-promised');
 const requireSubvert = require('require-subvert')(__dirname);
 const express = require('express');
+const http = require('http');
 
 let ExpressWrapper = require('../../lib/index.js');
 const logger = require('cta-logger');
@@ -23,19 +24,22 @@ describe('ExpressWrapper - Start', function() {
     let stubExpress;
     let mockExpressApp;
     let mockHttpServer;
-    before(function() {
+    before(function(done) {
+      // spy logger
+      sinon.spy(DEFAULTDEPENDENCIES.logger, 'info');
+
+      // stub NodeJS Http module createServer method; returns a mocked Http Server
+      mockHttpServer = http.createServer(mockExpressApp).on('listening', function() {
+        done();
+      });
+      sinon.spy(mockHttpServer, 'listen');
+      sinon.stub(http, 'createServer').returns(mockHttpServer);
+
       // mock an Express Application
       mockExpressApp = express();
-      // mock an HTTP Server
-      mockHttpServer = mockExpressApp.listen(DEFAULTCONFIG.port);
-      // stub Express App listen() to return the mocked HTTP Server
-      sinon.stub(mockExpressApp, 'listen').returns(mockHttpServer);
       // stub NodeJS Express module to return the mocked Express App
       stubExpress = sinon.stub().returns(mockExpressApp);
       requireSubvert.subvert('express', stubExpress);
-
-      // spy logger
-      sinon.spy(DEFAULTDEPENDENCIES.logger, 'info');
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
@@ -47,6 +51,7 @@ describe('ExpressWrapper - Start', function() {
 
     after(function() {
       requireSubvert.cleanUp();
+      http.createServer.restore();
       DEFAULTDEPENDENCIES.logger.info.restore();
       mockHttpServer.close();
     });
@@ -58,11 +63,11 @@ describe('ExpressWrapper - Start', function() {
     });
 
     it('should start the Express App (listen()) on configured port', function() {
-      expect(restapi.app.listen.calledWith(restapi.port)).to.equal(true);
+      expect(restapi.server.listen.calledWith(restapi.port)).to.equal(true);
     });
 
-    it('should set the returned http.Server from Express App as \'server\' property', function() {
-      expect(restapi.server).to.equal(mockHttpServer);
+    it('should set isServerStarting property to true', function() {
+      expect(restapi.isServerStarting).to.equal(true);
     });
 
     it('should log a success message', function() {
@@ -77,19 +82,22 @@ describe('ExpressWrapper - Start', function() {
     let stubExpress;
     let mockExpressApp;
     let mockHttpServer;
-    before(function() {
+    before(function(done) {
+      // spy logger
+      sinon.spy(DEFAULTDEPENDENCIES.logger, 'info');
+
+      // stub NodeJS Http module createServer method; returns a mocked Http Server
+      mockHttpServer = http.createServer(mockExpressApp).on('listening', function() {
+        done();
+      });
+      sinon.spy(mockHttpServer, 'listen');
+      sinon.stub(http, 'createServer').returns(mockHttpServer);
+
       // mock an Express Application
       mockExpressApp = express();
-      // mock an HTTP Server
-      mockHttpServer = mockExpressApp.listen(DEFAULTCONFIG.port);
-      // stub Express App listen() to return the mocked HTTP Server
-      sinon.stub(mockExpressApp, 'listen').returns(mockHttpServer);
       // stub NodeJS Express module to return the mocked Express App
       stubExpress = sinon.stub().returns(mockExpressApp);
       requireSubvert.subvert('express', stubExpress);
-
-      // spy logger
-      sinon.spy(DEFAULTDEPENDENCIES.logger, 'info');
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
@@ -97,19 +105,18 @@ describe('ExpressWrapper - Start', function() {
 
       // start
       restapi.start();
-
-      // try to start again
       restapi.start();
     });
 
     after(function() {
       requireSubvert.cleanUp();
+      http.createServer.restore();
       DEFAULTDEPENDENCIES.logger.info.restore();
       mockHttpServer.close();
     });
 
-    it('should not try to start the Express App (listen()) on configured port', function() {
-      expect(restapi.app.listen.calledTwice).to.equal(false);
+    it('should not try to start the HTTP Server (listen()) on configured port', function() {
+      expect(restapi.server.listen.calledTwice).to.equal(false);
     });
 
     it('should log a already-started message', function() {
@@ -119,51 +126,107 @@ describe('ExpressWrapper - Start', function() {
     });
   });
 
-  context('when Express App fails to start', function() {
+  context('when HTTP Server emits an Error', function() {
     let restapi;
     let stubExpress;
     let mockExpressApp;
-    const mockExpressAppListenError = new Error('mock listen error');
+    let mockHttpServer;
+    const mockError = new Error('mock http server error');
     let expectedError;
     before(function(done) {
+      // spy logger
+      sinon.spy(DEFAULTDEPENDENCIES.logger, 'error');
+
+      // stub NodeJS Http module createServer method; returns a mocked Http Server
+      mockHttpServer = http.createServer(mockExpressApp);
+      sinon.spy(mockHttpServer, 'listen');
+
+      sinon.stub(http, 'createServer').returns(mockHttpServer);
       // mock an Express Application
       mockExpressApp = express();
-      // stub Express App listen() to throw an Error
-      sinon.stub(mockExpressApp, 'listen').throws(mockExpressAppListenError);
       // stub NodeJS Express module to return the mocked Express App
       stubExpress = sinon.stub().returns(mockExpressApp);
       requireSubvert.subvert('express', stubExpress);
-
-      // spy logger
-      sinon.spy(DEFAULTDEPENDENCIES.logger, 'error');
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
       restapi = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
 
       // start
-      try {
-        restapi.start();
-        done(new Error('start should have crashed.'));
-      } catch (error) {
-        expectedError = error;
-        done();
-      }
+      restapi.start();
+      const errorCallback = mockHttpServer.listeners('error')[0];
+      mockHttpServer.removeListener('error', errorCallback);
+      mockHttpServer.on('error', function(error) {
+        try {
+          errorCallback(error);
+        } catch (finalError) {
+          expectedError = finalError;
+          done();
+        }
+      });
+
+      // simulate error
+      mockHttpServer.emit('error', mockError);
     });
 
     after(function() {
       requireSubvert.cleanUp();
+      http.createServer.restore();
       DEFAULTDEPENDENCIES.logger.error.restore();
+      mockHttpServer.close();
     });
 
-    it('should log an error message', function() {
+    it('should log a warning message', function() {
       return expect(restapi.logger.error.calledWith(
-        `Error when starting Express Application on port ${restapi.port}: ${mockExpressAppListenError.message}`
+        `Error emitted by Express Application on port ${restapi.port}: ${expectedError.message}`
       )).to.equal(true);
     });
 
     it('should throw an Error', function() {
-      return expect(expectedError).to.equal(mockExpressAppListenError);
+      return expect(expectedError).to.equal(mockError);
+    });
+  });
+
+  context('when HTTP Server fails to start (e.g. listen)', function() {
+    let restapi;
+    let stubExpress;
+    let mockExpressApp;
+    let mockHttpServer;
+    const mockHttpServerListenError = new Error('mock listen error');
+    let expectedError;
+    before(function() {
+      // spy logger
+      sinon.spy(DEFAULTDEPENDENCIES.logger, 'error');
+
+      // stub NodeJS Http module createServer method; returns a mocked Http Server
+      mockHttpServer = http.createServer(mockExpressApp);
+      sinon.stub(mockHttpServer, 'listen').throws(mockHttpServerListenError);
+      sinon.stub(http, 'createServer').returns(mockHttpServer);
+
+      // mock an Express Application
+      mockExpressApp = express();
+      // stub NodeJS Express module to return the mocked Express App
+      stubExpress = sinon.stub().returns(mockExpressApp);
+      requireSubvert.subvert('express', stubExpress);
+
+      // reload ExpressWrapper class with stubbed Express
+      ExpressWrapper = requireSubvert.require('../../lib/index.js');
+      restapi = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+    });
+
+    after(function() {
+      requireSubvert.cleanUp();
+      http.createServer.restore();
+      DEFAULTDEPENDENCIES.logger.error.restore();
+    });
+
+    it('should throw an Error', function() {
+      expect(function() {
+        restapi.start();
+      }).throw(Error, expectedError);
+      expect(restapi.logger.error.calledWith(
+          `Error when starting Express Application on port ${restapi.port}: ${mockHttpServerListenError.message}`
+        )).to.equal(true);
     });
   });
 });

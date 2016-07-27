@@ -1,7 +1,7 @@
 'use strict';
 
 const config = {
-  port: 3000,
+  port: 1000,
 };
 
 module.exports = config;

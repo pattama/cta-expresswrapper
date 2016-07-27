@@ -21,7 +21,7 @@ const DEFAULTCONFIG = require('./index.config.testdata.js');
 
 describe('ExpressWrapper - Constructor', function() {
   context('when everything ok', function() {
-    let restapi;
+    let expresswrapper;
     let stubExpress;
     let mockExpressApp;
     let mockHttpServer;
@@ -41,7 +41,8 @@ describe('ExpressWrapper - Constructor', function() {
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
-      restapi = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      sinon.spy(ExpressWrapper.prototype, '_wrap');
+      expresswrapper = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
     });
 
     after(function() {
@@ -50,41 +51,46 @@ describe('ExpressWrapper - Constructor', function() {
     });
 
     it('should return a new ExpressWrapper object', function() {
-      expect(restapi).to.be.an.instanceof(ExpressWrapper);
+      expect(expresswrapper).to.be.an.instanceof(ExpressWrapper);
     });
 
     it('should have the configuration as a \'configuration\' property', function() {
-      expect(restapi).to.have.property('configuration', DEFAULTCONFIG);
+      expect(expresswrapper).to.have.property('configuration', DEFAULTCONFIG);
     });
 
     it('should have configuration.port as a \'port\' Number property', function() {
-      expect(restapi).to.have.property('port', DEFAULTCONFIG.port);
+      expect(expresswrapper).to.have.property('port', DEFAULTCONFIG.port);
     });
 
     it('should have the dependencies as a \'dependencies\' property', function() {
-      expect(restapi).to.have.property('dependencies', DEFAULTDEPENDENCIES);
+      expect(expresswrapper).to.have.property('dependencies', DEFAULTDEPENDENCIES);
     });
 
     it('should have a logger instance set as a \'logger\' property', function() {
-      expect(restapi).to.have.property('logger', DEFAULTDEPENDENCIES.logger);
+      expect(expresswrapper).to.have.property('logger', DEFAULTDEPENDENCIES.logger);
     });
 
     it('should have an Express application instance as \'app\' property', function() {
-      expect(restapi).to.have.property('app', mockExpressApp);
+      expect(expresswrapper).to.have.property('app', mockExpressApp);
     });
 
     it('should have an HTTP Server as \'server\' property', function() {
-      expect(restapi).to.have.property('server', mockHttpServer);
+      expect(expresswrapper).to.have.property('server', mockHttpServer);
+    });
+
+    it('should have a Routes Map as \'routes\' property', function() {
+      expect(expresswrapper).to.have.property('routes').and.to.be.a('Map');
     });
 
     it('should have a Boolean false as \'isServerStarting\' property', function() {
-      expect(restapi).to.have.property('isServerStarting', false);
+      expect(expresswrapper).to.have.property('isServerStarting', false);
     });
 
     it('for each HTTP methods in nodejs module \'methods\', it should have a method of the same name', function() {
       methods.forEach(function(method) {
-        expect(restapi).to.have.property(method).and.to.be.a('function');
-        restapi[method]();
+        expect(expresswrapper._wrap.calledWith(method)).to.equal(true);
+        expect(expresswrapper).to.have.property(method).and.to.be.a('function');
+        expresswrapper[method]();
         expect(mockExpressApp[method].called).to.equal(true);
       });
     });

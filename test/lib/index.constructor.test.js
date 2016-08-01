@@ -9,6 +9,7 @@ const requireSubvert = require('require-subvert')(__dirname);
 const express = require('express');
 const http = require('http');
 const methods = require('methods');
+const _ = require('lodash');
 
 let ExpressWrapper = require('../../lib/index.js');
 const logger = require('cta-logger');
@@ -93,6 +94,42 @@ describe('ExpressWrapper - Constructor', function() {
         expresswrapper[method]();
         expect(mockExpressApp[method].called).to.equal(true);
       });
+    });
+  });
+
+  context(`when missing/incorrect 'configuration' argument`, function() {
+    it('should throw an Error', function() {
+      return expect(function() {
+        return new ExpressWrapper(null, DEFAULTDEPENDENCIES);
+      }).to.throw(Error, `missing/incorrect 'configuration' object argument`);
+    });
+  });
+
+  context(`when missing/incorrect 'port' property in configuration`, function() {
+    const config = _.cloneDeep(DEFAULTCONFIG);
+    it('should throw an Error', function() {
+      delete config.port;
+      return expect(function() {
+        return new ExpressWrapper(config, DEFAULTDEPENDENCIES);
+      }).to.throw(Error, `missing/incorrect 'port' number property in configuration`);
+    });
+  });
+
+  context(`when missing/incorrect 'dependencies' argument`, function() {
+    it('should throw an Error', function() {
+      return expect(function() {
+        return new ExpressWrapper(DEFAULTCONFIG, null);
+      }).to.throw(Error, `missing/incorrect 'dependencies' object argument`);
+    });
+  });
+
+  context(`when missing/incorrect 'logger' tool in dependencies`, function() {
+    const dependencies = _.cloneDeep(DEFAULTDEPENDENCIES);
+    it('should throw an Error', function() {
+      delete dependencies.logger;
+      return expect(function() {
+        return new ExpressWrapper(DEFAULTCONFIG, dependencies);
+      }).to.throw(Error, `missing/incorrect 'logger' tool in dependencies`);
     });
   });
 });

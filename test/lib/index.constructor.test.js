@@ -5,6 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 const sinon = require('sinon');
 require('sinon-as-promised');
+const mockrequire = require('mock-require');
 const requireSubvert = require('require-subvert')(__dirname);
 const express = require('express');
 const http = require('http');
@@ -43,7 +44,7 @@ describe('ExpressWrapper - Constructor', function() {
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
       sinon.spy(ExpressWrapper.prototype, '_wrap');
-      expresswrapper = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      expresswrapper = new ExpressWrapper(DEFAULTDEPENDENCIES, DEFAULTCONFIG);
     });
 
     after(function() {
@@ -60,16 +61,16 @@ describe('ExpressWrapper - Constructor', function() {
     });
 
     it('should have configuration.port as a \'port\' Number property', function() {
-      expect(expresswrapper).to.have.property('port', DEFAULTCONFIG.port);
+      expect(expresswrapper).to.have.property('port', DEFAULTCONFIG.properties.port);
     });
 
     it('should have the dependencies as a \'dependencies\' property', function() {
       expect(expresswrapper).to.have.property('dependencies', DEFAULTDEPENDENCIES);
     });
 
-    it('should have a logger instance set as a \'logger\' property', function() {
-      expect(expresswrapper).to.have.property('logger', DEFAULTDEPENDENCIES.logger);
-    });
+    // it('should have a logger instance set as a \'logger\' property', function() {
+    //   expect(expresswrapper).to.have.property('logger', DEFAULTDEPENDENCIES.logger);
+    // });
 
     it('should have an Express application instance as \'app\' property', function() {
       expect(expresswrapper).to.have.property('app', mockExpressApp);
@@ -97,39 +98,65 @@ describe('ExpressWrapper - Constructor', function() {
     });
   });
 
-  context(`when missing/incorrect 'configuration' argument`, function() {
-    it('should throw an Error', function() {
-      return expect(function() {
-        return new ExpressWrapper(null, DEFAULTDEPENDENCIES);
-      }).to.throw(Error, `missing/incorrect 'configuration' object argument`);
+  context('when everything ok and logger instance exists in dependencies', function() {
+    let tool;
+    let mockLoggerAuthorResult;
+    before(function() {
+      mockLoggerAuthorResult = {
+        info: sinon.stub(),
+      };
+      sinon.stub(DEFAULTDEPENDENCIES.logger, 'author').withArgs(DEFAULTCONFIG.name).returns(mockLoggerAuthorResult);
+      tool = new ExpressWrapper(DEFAULTDEPENDENCIES, DEFAULTCONFIG);
+    });
+    after(function() {
+      DEFAULTDEPENDENCIES.logger.author.restore();
+    });
+    it('should set instance returned by dependencies.logger.author() method as a property of the Tool instance', function() {
+      expect(tool).to.have.property('logger', mockLoggerAuthorResult);
+    });
+    it('should log a logger initialized message', function() {
+      sinon.assert.calledWith(mockLoggerAuthorResult.info, `Initialized logger for Tool ${tool.name}`);
     });
   });
 
-  context(`when missing/incorrect 'port' property in configuration`, function() {
+  context('when everything ok and logger instance does not exist in dependencies', function() {
+    let tool;
+    const dependencies = _.cloneDeep(DEFAULTDEPENDENCIES);
+    delete dependencies.logger;
+    let MockLoggerConstructor;
+    let mockLogger;
+    let mockLoggerAuthorResult;
+    before(function() {
+      mockLoggerAuthorResult = {
+        info: sinon.stub(),
+      };
+      mockLogger = {
+        author: sinon.stub().withArgs(DEFAULTCONFIG.name).returns(mockLoggerAuthorResult),
+      };
+      MockLoggerConstructor = sinon.stub().returns(mockLogger);
+      mockrequire('cta-logger', MockLoggerConstructor);
+      tool = new ExpressWrapper(dependencies, DEFAULTCONFIG);
+    });
+    after(function() {
+    });
+    it('should create a new Logger', function() {
+      sinon.assert.called(MockLoggerConstructor);
+    });
+    it('should set instance returned by new logger.author() method as a property of the Tool instance', function() {
+      expect(tool).to.have.property('logger', mockLoggerAuthorResult);
+    });
+    it('should log a logger initialized message', function() {
+      sinon.assert.calledWith(mockLoggerAuthorResult.info, `Initialized logger for Tool ${tool.name}`);
+    });
+  });
+
+  context(`when missing/incorrect 'port' property in configuration.properties`, function() {
     const config = _.cloneDeep(DEFAULTCONFIG);
     it('should throw an Error', function() {
-      delete config.port;
+      delete config.properties.port;
       return expect(function() {
-        return new ExpressWrapper(config, DEFAULTDEPENDENCIES);
+        return new ExpressWrapper(DEFAULTDEPENDENCIES, config);
       }).to.throw(Error, `missing/incorrect 'port' number property in configuration`);
-    });
-  });
-
-  context(`when missing/incorrect 'dependencies' argument`, function() {
-    it('should throw an Error', function() {
-      return expect(function() {
-        return new ExpressWrapper(DEFAULTCONFIG, null);
-      }).to.throw(Error, `missing/incorrect 'dependencies' object argument`);
-    });
-  });
-
-  context(`when missing/incorrect 'logger' tool in dependencies`, function() {
-    const dependencies = _.cloneDeep(DEFAULTDEPENDENCIES);
-    it('should throw an Error', function() {
-      delete dependencies.logger;
-      return expect(function() {
-        return new ExpressWrapper(DEFAULTCONFIG, dependencies);
-      }).to.throw(Error, `missing/incorrect 'logger' tool in dependencies`);
     });
   });
 });

@@ -41,7 +41,7 @@ describe('ExpressWrapper - _wrap and http methods', function() {
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
-      expresswrapper = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      expresswrapper = new ExpressWrapper(DEFAULTDEPENDENCIES, DEFAULTCONFIG);
     });
 
     after(function() {
@@ -54,11 +54,20 @@ describe('ExpressWrapper - _wrap and http methods', function() {
         const mockPath = '/mock';
         const mockHandler = sinon.stub();
         before(function() {
+          sinon.spy(expresswrapper.logger, 'debug');
           expresswrapper[method](mockPath, mockHandler);
+        });
+        after(function() {
+          expresswrapper.logger.debug.restore();
         });
 
         it(`should call Express App ${method} (e.g. set a route)`, function() {
           expect(expresswrapper.app[method].calledWith(mockPath, mockHandler)).to.equal(true);
+        });
+
+        it(`should log a debug message`, function() {
+          sinon.assert.calledWith(expresswrapper.logger.debug,
+            `Route ${method.toUpperCase()} ${mockPath} bound successfully.`);
         });
 
         it(`add route info (method, path, callback) to routes Map`, function() {
@@ -90,7 +99,7 @@ describe('ExpressWrapper - _wrap and http methods', function() {
   });
 
   context('when route is already defined (example with GET)', function() {
-    let restapi;
+    let expresswrapper;
     let stubExpress;
     let mockExpressApp;
     let mockHttpServer;
@@ -111,10 +120,10 @@ describe('ExpressWrapper - _wrap and http methods', function() {
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
-      restapi = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      expresswrapper = new ExpressWrapper(DEFAULTDEPENDENCIES, DEFAULTCONFIG);
 
       // define the GET /mock route a first time
-      restapi[mockMethod](mockPath, mockHandler);
+      expresswrapper[mockMethod](mockPath, mockHandler);
     });
 
     after(function() {
@@ -124,7 +133,7 @@ describe('ExpressWrapper - _wrap and http methods', function() {
 
     it('should throw an Error', function() {
       expect(function() {
-        restapi[mockMethod](mockPath, mockHandler); // try to define it a second time
+        expresswrapper[mockMethod](mockPath, mockHandler); // try to define it a second time
       }).to.throw(Error, `Route ${mockMethod.toUpperCase()} ${mockPath} has already been defined.`);
     });
   });
@@ -153,7 +162,7 @@ describe('ExpressWrapper - _wrap and http methods', function() {
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
-      expresswrapper = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      expresswrapper = new ExpressWrapper(DEFAULTDEPENDENCIES, DEFAULTCONFIG);
     });
 
     after(function() {

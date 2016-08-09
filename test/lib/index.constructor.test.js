@@ -150,6 +150,22 @@ describe('ExpressWrapper - Constructor', function() {
     });
   });
 
+  context('when everything ok and singleton is true', function() {
+    let singleton;
+    let config;
+    before(function() {
+      config = _.cloneDeep(DEFAULTCONFIG);
+      config.singleton = true;
+      singleton = new ExpressWrapper(DEFAULTDEPENDENCIES, config);
+    });
+    after(function() {
+    });
+    it('should return the instantiated and registered singleton', function() {
+      const tool = new ExpressWrapper(DEFAULTDEPENDENCIES, config);
+      expect(tool).to.equal(singleton);
+    });
+  });
+
   context(`when missing/incorrect 'port' property in configuration.properties`, function() {
     const config = _.cloneDeep(DEFAULTCONFIG);
     it('should throw an Error', function() {

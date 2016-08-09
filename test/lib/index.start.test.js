@@ -25,9 +25,6 @@ describe('ExpressWrapper - Start', function() {
     let mockExpressApp;
     let mockHttpServer;
     before(function(done) {
-      // spy logger
-      sinon.spy(DEFAULTDEPENDENCIES.logger, 'info');
-
       // stub NodeJS Http module createServer method; returns a mocked Http Server
       mockHttpServer = http.createServer(mockExpressApp).on('listening', function() {
         done();
@@ -43,7 +40,10 @@ describe('ExpressWrapper - Start', function() {
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
-      expresswrapper = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      expresswrapper = new ExpressWrapper(DEFAULTDEPENDENCIES, DEFAULTCONFIG);
+
+      // spy logger
+      sinon.spy(expresswrapper.logger, 'info');
 
       // start
       expresswrapper.start();
@@ -52,7 +52,7 @@ describe('ExpressWrapper - Start', function() {
     after(function() {
       requireSubvert.cleanUp();
       http.createServer.restore();
-      DEFAULTDEPENDENCIES.logger.info.restore();
+      expresswrapper.logger.info.restore();
       mockHttpServer.close();
     });
 
@@ -83,9 +83,6 @@ describe('ExpressWrapper - Start', function() {
     let mockExpressApp;
     let mockHttpServer;
     before(function(done) {
-      // spy logger
-      sinon.spy(DEFAULTDEPENDENCIES.logger, 'info');
-
       // stub NodeJS Http module createServer method; returns a mocked Http Server
       mockHttpServer = http.createServer(mockExpressApp).on('listening', function() {
         done();
@@ -101,7 +98,10 @@ describe('ExpressWrapper - Start', function() {
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
-      expresswrapper = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      expresswrapper = new ExpressWrapper(DEFAULTDEPENDENCIES, DEFAULTCONFIG);
+
+      // spy logger
+      sinon.spy(expresswrapper.logger, 'info');
 
       // start
       expresswrapper.start();
@@ -111,7 +111,7 @@ describe('ExpressWrapper - Start', function() {
     after(function() {
       requireSubvert.cleanUp();
       http.createServer.restore();
-      DEFAULTDEPENDENCIES.logger.info.restore();
+      expresswrapper.logger.info.restore();
       mockHttpServer.close();
     });
 
@@ -134,9 +134,6 @@ describe('ExpressWrapper - Start', function() {
     const mockError = new Error('mock http server error');
     let expectedError;
     before(function(done) {
-      // spy logger
-      sinon.spy(DEFAULTDEPENDENCIES.logger, 'error');
-
       // stub NodeJS Http module createServer method; returns a mocked Http Server
       mockHttpServer = http.createServer(mockExpressApp);
       sinon.spy(mockHttpServer, 'listen');
@@ -150,7 +147,10 @@ describe('ExpressWrapper - Start', function() {
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
-      expresswrapper = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      expresswrapper = new ExpressWrapper(DEFAULTDEPENDENCIES, DEFAULTCONFIG);
+
+      // spy logger
+      sinon.spy(expresswrapper.logger, 'error');
 
       // start
       expresswrapper.start();
@@ -172,7 +172,7 @@ describe('ExpressWrapper - Start', function() {
     after(function() {
       requireSubvert.cleanUp();
       http.createServer.restore();
-      DEFAULTDEPENDENCIES.logger.error.restore();
+      expresswrapper.logger.error.restore();
       mockHttpServer.close();
     });
 
@@ -195,9 +195,6 @@ describe('ExpressWrapper - Start', function() {
     const mockHttpServerListenError = new Error('mock listen error');
     let expectedError;
     before(function() {
-      // spy logger
-      sinon.spy(DEFAULTDEPENDENCIES.logger, 'error');
-
       // stub NodeJS Http module createServer method; returns a mocked Http Server
       mockHttpServer = http.createServer(mockExpressApp);
       sinon.stub(mockHttpServer, 'listen').throws(mockHttpServerListenError);
@@ -211,13 +208,16 @@ describe('ExpressWrapper - Start', function() {
 
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
-      expresswrapper = new ExpressWrapper(DEFAULTCONFIG, DEFAULTDEPENDENCIES);
+      expresswrapper = new ExpressWrapper(DEFAULTDEPENDENCIES, DEFAULTCONFIG);
+
+      // spy logger
+      sinon.spy(expresswrapper.logger, 'error');
     });
 
     after(function() {
       requireSubvert.cleanUp();
       http.createServer.restore();
-      DEFAULTDEPENDENCIES.logger.error.restore();
+      expresswrapper.logger.error.restore();
     });
 
     it('should throw an Error', function() {

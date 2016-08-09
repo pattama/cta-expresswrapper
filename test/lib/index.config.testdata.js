@@ -1,7 +1,10 @@
 'use strict';
 
 const config = {
-  port: 1000,
+  name: 'tool',
+  properties: {
+    port: 1000,
+  },
 };
 
 module.exports = config;

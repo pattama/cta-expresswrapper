@@ -151,7 +151,7 @@ describe('ExpressWrapper - _wrap and http methods', function() {
       // stub NodeJS Express module; returns a mocked Express App
       // mock an Express Application by stubbing all its HTTP methods
       mockExpressApp = express();
-      sinon.stub(mockExpressApp, mockMethod).throws(mockExpressAppMethodError);
+      sinon.stub(mockExpressApp, mockMethod).withArgs(mockPath).throws(mockExpressAppMethodError);
 
       stubExpress = sinon.stub().returns(mockExpressApp);
       requireSubvert.subvert('express', stubExpress);

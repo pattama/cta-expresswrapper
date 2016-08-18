@@ -27,10 +27,13 @@ describe('ExpressWrapper - Constructor', function() {
     let stubExpress;
     let mockExpressApp;
     let mockHttpServer;
+    const reqCallback = ExpressWrapper.prototype
+      ._onRequestAndResponseMiddleware.bind(expresswrapper);
     before(function() {
       // stub NodeJS Express module; returns a mocked Express App
       // mock an Express Application by stubbing all its HTTP methods
       mockExpressApp = express();
+      sinon.spy(mockExpressApp, 'use');
       methods.forEach(function(method) {
         mockExpressApp[method] = sinon.stub();
       });
@@ -44,6 +47,7 @@ describe('ExpressWrapper - Constructor', function() {
       // reload ExpressWrapper class with stubbed Express
       ExpressWrapper = requireSubvert.require('../../lib/index.js');
       sinon.spy(ExpressWrapper.prototype, '_wrap');
+      sinon.stub(ExpressWrapper.prototype._onRequestAndResponseMiddleware, 'bind').returns(reqCallback);
       expresswrapper = new ExpressWrapper(DEFAULTDEPENDENCIES, DEFAULTCONFIG);
     });
 
@@ -74,6 +78,10 @@ describe('ExpressWrapper - Constructor', function() {
 
     it('should have an Express application instance as \'app\' property', function() {
       expect(expresswrapper).to.have.property('app', mockExpressApp);
+    });
+
+    it('should use _onRequestAndResponseMiddleware method on \'app\' instance', function() {
+      sinon.assert.calledWith(mockExpressApp.use, reqCallback);
     });
 
     it('should have an HTTP Server as \'server\' property', function() {

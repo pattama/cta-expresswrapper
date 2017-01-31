@@ -4,34 +4,33 @@
   "description": "Express Wrapper tool for Compass Test Automation",
   "main": "lib/index.js",
   "scripts": {
-    "lint": "eslint --ignore-path .gitignore lib/**/*.js test/**/*.js",
-    "test": "mocha -R spec --recursive test",
-    "codecoverage": "istanbul cover mocha -- -R spec --recursive test",
+    "test": "NODE_PATH=. _mocha",
+    "codecoverage": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec",
+    "lint": "eslint --quiet lib test",
+    "docs": "jsdoc --readme README.md lib -r -d docs && opener ./docs/index.html",
     "codecoveragewin": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec && opener ./coverage/lcov-report/index.html",
     "all": "npm run lint && npm run codecoverage",
-    "gitlab-ci": "npm run all",
-    "docs": "jsdoc2md \"lib/**/*.js\" > DOCUMENTATION.md && jsdoc --readme README.md lib -r -d docs"
+    "gitlab-ci": "npm run all"
   },
   "engines": {
-    "node": "4.2.2"
+    "node": "6.9.4"
   },
   "contributors": [
     "Pittawat Mongkonrat <pittawat.mongkonrat@thomsonreuters.com>",
     "Kiettisak Angkanawin <kiettisak.angkanawin@thomsonreuters.com>"
   ],
-  "author": "",
+  "author": "CTA Team <cta@thomsonreuters.com>",
   "license": "Apache-2.0",
   "directories": {
     "test": "test"
   },
   "devDependencies": {
-    "babel-eslint": "^4.1.5",
+    "cta-logger": "git+ssh://git@git.sami.int.thomsonreuters.com:compass/cta-logger.git",
+    "eslint": "^3.2.2",
+    "eslint-config-cta": "git+ssh://git@git.sami.int.thomsonreuters.com:compass/eslint-config-cta.git",
     "bson": "^0.4.23",
     "chai": "^3.4.0",
     "chai-as-promised": "^5.1.0",
-    "eslint": "^1.9.0",
-    "eslint-config-airbnb": "^1.0.0",
-    "eslint-plugin-react": "^3.9.0",
     "istanbul": "^0.4.1",
     "jsdoc": "^3.4.0",
     "jsdoc-to-markdown": "^1.3.6",
@@ -48,6 +47,7 @@
     "sinon-as-promised": "^4.0.0"
   },
   "dependencies": {
+    "cta-tool": "git+ssh://git@git.sami.int.thomsonreuters.com:compass/cta-tool.git",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "methods": "^1.1.2"

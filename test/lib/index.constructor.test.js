@@ -174,13 +174,13 @@ describe('ExpressWrapper - Constructor', function() {
     });
   });
 
-  context(`when missing/incorrect 'port' property in configuration.properties`, function() {
+  context('when missing/incorrect \'port\' property in configuration.properties', function() {
     const config = _.cloneDeep(DEFAULTCONFIG);
     it('should throw an Error', function() {
       delete config.properties.port;
       return expect(function() {
         return new ExpressWrapper(DEFAULTDEPENDENCIES, config);
-      }).to.throw(Error, `missing/incorrect 'port' number property in configuration`);
+      }).to.throw(Error, 'missing/incorrect \'port\' number property in configuration');
     });
   });
 });

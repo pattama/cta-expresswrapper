@@ -65,12 +65,12 @@ describe('ExpressWrapper - _wrap and http methods', function() {
           expect(expresswrapper.app[method].calledWith(mockPath, mockHandler)).to.equal(true);
         });
 
-        it(`should log a debug message`, function() {
+        it('should log a debug message', function() {
           sinon.assert.calledWith(expresswrapper.logger.debug,
             `Route ${method.toUpperCase()} ${mockPath} bound successfully.`);
         });
 
-        it(`add route info (method, path, callback) to routes Map`, function() {
+        it('add route info (method, path, callback) to routes Map', function() {
           expect(expresswrapper.routes.has(method)).to.equal(true);
           expect(expresswrapper.routes.get(method).has(mockPath)).to.equal(true);
           expect(expresswrapper.routes.get(method).get(mockPath)).to.equal(mockHandler);
@@ -78,7 +78,7 @@ describe('ExpressWrapper - _wrap and http methods', function() {
       });
     });
 
-    describe(`calling method get again for code coverage`, function() {
+    describe('calling method get again for code coverage', function() {
       const method = 'get';
       const mockPath = '/mockagain';
       const mockHandler = sinon.stub();
@@ -90,7 +90,7 @@ describe('ExpressWrapper - _wrap and http methods', function() {
         expect(expresswrapper.app[method].calledWith(mockPath, mockHandler)).to.equal(true);
       });
 
-      it(`add route info (method, path, callback) to routes Map`, function() {
+      it('add route info (method, path, callback) to routes Map', function() {
         expect(expresswrapper.routes.has(method)).to.equal(true);
         expect(expresswrapper.routes.get(method).has(mockPath)).to.equal(true);
         expect(expresswrapper.routes.get(method).get(mockPath)).to.equal(mockHandler);

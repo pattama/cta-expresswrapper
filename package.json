@@ -46,9 +46,10 @@
     "sinon-as-promised": "^4.0.0"
   },
   "dependencies": {
+    "body-parser": "^1.15.2",
+    "cors": "^2.8.4",
     "cta-logger": "git+ssh://git@git.sami.int.thomsonreuters.com:compass/cta-logger.git#1.0.0",
     "cta-tool": "git+ssh://git@git.sami.int.thomsonreuters.com:compass/cta-tool.git#1.0.0",
-    "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "methods": "^1.1.2"
   }

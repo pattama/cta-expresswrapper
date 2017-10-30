@@ -52,7 +52,7 @@ module.exports = ExpressWrapper;
 
 ### 3. Constructor
 
-Because the **ExpressWrapper** class is extending **Tool**, its constructor has **_dependencies_** and **_configuration_** as parameters.
+Because the **ExpressWrapper** class is extending **Tool**, its constructor has **_dependencies_** and **_configuration_** as _parameters_.
 
 ```javascript
 class ExpressWrapper extends Tool {
@@ -68,7 +68,7 @@ class ExpressWrapper extends Tool {
 
 ### 4. Configuration
 
-ExpressWrapper uses **_configuration_** via constructor.
+ExpressWrapper uses **_configuration_** via _constructor_.
 
 ```javascript
 class ExpressWrapper extends Tool {

@@ -80,7 +80,7 @@ class ExpressWrapper extends Tool {
 }
 ```
 
-Because of Tool (cta-tool) extension, configuration needs to have these _fields_.
+Because of **Tool** (_cta-tool_) extension, the **configuration** needs to have these _fields_.
 
 * **name** - define the tool _name_
 * **singleton** - indicate whether the tool is _singleton_

@@ -137,4 +137,4 @@ class ExpressWrapper extends Tool {
 
 ## Considerations
 
-* Should we specify the version of **Express** because it's dependency?
+* Should we specify the version of **Express** in _package.json_ because it's dependency?

@@ -16,7 +16,7 @@ We aim to give you brief guidelines here.
 1. [Structure](#2-structure)
 1. [Constructor](#3-constructor)
 1. [Configuration](#4-configuration)
-1. [Express.listen() via ExpressWrapper.start()](#5-express-listen-via-expresswrapper-start-)
+1. [Express.listen() via ExpressWrapper.start()](#5-expresslisten-via-expresswrapperstart)
 
 ### 1. Usage
 ```javascript
@@ -28,7 +28,7 @@ const instance = new ExpressWrapper(dependencies, configuration);
 instance.start();
 ```
 
-We use [**ExpressWrapper.start()**](#5-express-listen-via-expresswrapper-start-) to start the **Express**.
+We use [**ExpressWrapper.start()**](#5-expresslisten-via-expresswrapperstart) to start the **Express**.
 
 [back to top](#guidelines)
 

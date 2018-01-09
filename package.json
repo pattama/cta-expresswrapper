@@ -9,11 +9,16 @@
     "lint": "eslint --quiet lib test",
     "docs": "jsdoc --readme README.md lib -r -d docs && opener ./docs/index.html",
     "codecoveragewin": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec && opener ./coverage/lcov-report/index.html",
+    "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && codecov",
     "all": "npm run lint && npm run codecoverage",
     "gitlab-ci": "npm run all"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thomsonreuters/cta-expresswrapper.git"
+  },
   "engines": {
-    "node": "6.9.4"
+    "node": ">=6"
   },
   "contributors": [
     "Pittawat Mongkonrat <pittawat.mongkonrat@thomsonreuters.com>",
@@ -25,11 +30,13 @@
     "test": "test"
   },
   "devDependencies": {
-    "eslint": "^3.2.2",
-    "eslint-config-cta": "git+ssh://git@git.sami.int.thomsonreuters.com:compass/eslint-config-cta.git",
     "bson": "^0.4.23",
     "chai": "^3.4.0",
     "chai-as-promised": "^5.1.0",
+    "codecov": "^3.0.0",
+    "coveralls": "^3.0.0",
+    "eslint": "^3.2.2",
+    "eslint-config-cta": "^1.0.1",
     "istanbul": "^0.4.1",
     "jsdoc": "^3.4.0",
     "jsdoc-to-markdown": "^1.3.6",
@@ -48,8 +55,8 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "cors": "^2.8.4",
-    "cta-logger": "git+ssh://git@git.sami.int.thomsonreuters.com:compass/cta-logger.git#1.0.0",
-    "cta-tool": "git+ssh://git@git.sami.int.thomsonreuters.com:compass/cta-tool.git#1.0.0",
+    "cta-logger": "thomsonreuters/cta-logger#1.0.0",
+    "cta-tool": "thomsonreuters/cta-tool#1.0.0",
     "express": "^4.14.0",
     "methods": "^1.1.2"
   }

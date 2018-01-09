@@ -1,4 +1,7 @@
-# cta-expresswrapper [ ![build status](https://git.sami.int.thomsonreuters.com/compass/cta-expresswrapper/badges/master/build.svg)](https://git.sami.int.thomsonreuters.com/compass/cta-expresswrapper/commits/master) [![coverage report](https://git.sami.int.thomsonreuters.com/compass/cta-expresswrapper/badges/master/coverage.svg)](https://git.sami.int.thomsonreuters.com/compass/cta-expresswrapper/commits/master)
+# cta-expresswrapper
+[![Build Status](https://travis-ci.org/thomsonreuters/cta-expresswrapper.svg?branch=master)](https://travis-ci.org/thomsonreuters/cta-expresswrapper)
+[![Coverage Status](https://coveralls.io/repos/github/thomsonreuters/cta-expresswrapper/badge.svg?branch=master)](https://coveralls.io/github/thomsonreuters/cta-expresswrapper?branch=master)
+[![codecov](https://codecov.io/gh/thomsonreuters/cta-expresswrapper/branch/master/graph/badge.svg)](https://codecov.io/gh/thomsonreuters/cta-expresswrapper)
 
 Web Application using [Express (expressjs.com)](https://expressjs.com) Modules for Compass Test Automation, One of Libraries in CTA-OSS Framework
 

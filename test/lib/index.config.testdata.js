@@ -3,7 +3,7 @@
 const config = {
   name: 'tool',
   properties: {
-    port: 1000,
+    port: 2000,
   },
 };
 
